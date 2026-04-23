@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: medishift-dev
+  labels:
+    app: medishift
+    environment: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: medishift-staging
+  labels:
+    app: medishift
+    environment: staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: medishift-prod
+  labels:
+    app: medishift
+    environment: prod

@@ -1,0 +1,230 @@
+---
+# ============================================================
+# SERVICE ACCOUNTS - One per service
+# ============================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-frontend-sa
+  namespace: medishift-dev
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-auth-sa
+  namespace: medishift-dev
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-staff-sa
+  namespace: medishift-dev
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-shift-sa
+  namespace: medishift-dev
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-leave-sa
+  namespace: medishift-dev
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: medishift-postgres-sa
+  namespace: medishift-dev
+
+---
+# ============================================================
+# ROLES - What each service is allowed to do
+# ============================================================
+
+# Frontend - can only read configmaps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-frontend-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+
+---
+# Auth Service - can read secrets and configmaps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-auth-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+
+---
+# Staff Service - can read secrets and configmaps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-staff-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+
+---
+# Shift Service - can read secrets and configmaps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-shift-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+
+---
+# Leave Service - can read secrets and configmaps
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-leave-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+
+---
+# Postgres - can only read its own secrets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: medishift-postgres-role
+  namespace: medishift-dev
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list"]
+
+---
+# ============================================================
+# ROLE BINDINGS - Link ServiceAccounts to Roles
+# ============================================================
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-frontend-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-frontend-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-frontend-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-auth-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-auth-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-auth-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-staff-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-staff-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-staff-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-shift-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-shift-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-shift-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-leave-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-leave-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-leave-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: medishift-postgres-rb
+  namespace: medishift-dev
+subjects:
+  - kind: ServiceAccount
+    name: medishift-postgres-sa
+    namespace: medishift-dev
+roleRef:
+  kind: Role
+  name: medishift-postgres-role
+  apiGroup: rbac.authorization.k8s.io

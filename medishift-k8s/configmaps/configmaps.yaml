@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medishift-config
+  namespace: medishift-dev
+data:
+  NODE_ENV: production
+  AUTH_SERVICE_URL: http://medishift-auth-service:3001
+  STAFF_SERVICE_URL: http://medishift-staff-service:3002
+  SHIFT_SERVICE_URL: http://medishift-shift-service:3003
+  LEAVE_SERVICE_URL: http://medishift-leave-service:3004
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medishift-config
+  namespace: medishift-staging
+data:
+  NODE_ENV: production
+  AUTH_SERVICE_URL: http://medishift-auth-service:3001
+  STAFF_SERVICE_URL: http://medishift-staff-service:3002
+  SHIFT_SERVICE_URL: http://medishift-shift-service:3003
+  LEAVE_SERVICE_URL: http://medishift-leave-service:3004
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: medishift-config
+  namespace: medishift-prod
+data:
+  NODE_ENV: production
+  AUTH_SERVICE_URL: http://medishift-auth-service:3001
+  STAFF_SERVICE_URL: http://medishift-staff-service:3002
+  SHIFT_SERVICE_URL: http://medishift-shift-service:3003
+  LEAVE_SERVICE_URL: http://medishift-leave-service:3004

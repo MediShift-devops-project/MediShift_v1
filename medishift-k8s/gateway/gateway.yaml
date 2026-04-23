@@ -1,0 +1,152 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: medishift-gateway
+  namespace: medishift-dev
+spec:
+  gatewayClassName: eg
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+---
+# Frontend - catch all (no rewrite needed)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: medishift-frontend-route
+  namespace: medishift-dev
+spec:
+  parentRefs:
+    - name: medishift-gateway
+      namespace: medishift-dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: medishift-frontend-service
+          port: 3000
+
+---
+# Auth Service - strip /api/auth prefix
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: medishift-auth-route
+  namespace: medishift-dev
+spec:
+  parentRefs:
+    - name: medishift-gateway
+      namespace: medishift-dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/auth
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/auth
+      backendRefs:
+        - name: medishift-auth-service
+          port: 3001
+
+---
+# Staff Service
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: medishift-staff-route
+  namespace: medishift-dev
+spec:
+  parentRefs:
+    - name: medishift-gateway
+      namespace: medishift-dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/staff
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/staff
+      backendRefs:
+        - name: medishift-staff-service
+          port: 3002
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/departments
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/departments
+      backendRefs:
+        - name: medishift-staff-service
+          port: 3002
+
+---
+# Shift Service
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: medishift-shift-route
+  namespace: medishift-dev
+spec:
+  parentRefs:
+    - name: medishift-gateway
+      namespace: medishift-dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/shifts
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/shifts
+      backendRefs:
+        - name: medishift-shift-service
+          port: 3003
+
+---
+# Leave Service
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: medishift-leave-route
+  namespace: medishift-dev
+spec:
+  parentRefs:
+    - name: medishift-gateway
+      namespace: medishift-dev
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/leaves
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/leaves
+      backendRefs:
+        - name: medishift-leave-service
+          port: 3004

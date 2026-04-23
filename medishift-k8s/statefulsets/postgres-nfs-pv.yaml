@@ -1,0 +1,30 @@
+---
+# New NFS Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: medishift-postgres-nfs-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 172.31.26.181
+    path: /srv/nfs/medishift
+
+---
+# New NFS Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: medishift-postgres-nfs-pvc
+  namespace: medishift-dev
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: medishift-postgres-nfs-pv
