@@ -1,37 +1,30 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: medishift-postgres
     environment:
-      - POSTGRES_USER=medishift
-      - POSTGRES_PASSWORD=medishift123
-      - POSTGRES_DB=medishift
+      POSTGRES_USER: medishift
+      POSTGRES_PASSWORD: medishift123
+      POSTGRES_DB: medishift
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - medishift-network
-    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U medishift"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
   auth-service:
-    build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
+    image: revanth654/medishift-auth:v1
     container_name: medishift-auth-service
     environment:
-      - PORT=3001
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://medishift:medishift123@postgres:5432/medishift
-      - JWT_SECRET=medishift_jwt_secret_key_2024
-      - STAFF_SERVICE_URL=http://staff-service:3002
+      DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
+      JWT_SECRET: medishift_jwt_secret_key_2024
+      PORT: 3001
+      NODE_ENV: production
+      STAFF_SERVICE_URL: http://staff-service:3002
     ports:
       - "3001:3001"
     depends_on:
@@ -39,85 +32,63 @@ services:
         condition: service_healthy
     networks:
       - medishift-network
-    restart: unless-stopped
 
   staff-service:
-    build:
-      context: ./services/staff-service
-      dockerfile: Dockerfile
+    image: revanth654/medishift-staff:v1
     container_name: medishift-staff-service
     environment:
-      - PORT=3002
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://medishift:medishift123@postgres:5432/medishift
-      - JWT_SECRET=medishift_jwt_secret_key_2024
-      - AUTH_SERVICE_URL=http://auth-service:3001
+      DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
+      JWT_SECRET: medishift_jwt_secret_key_2024
+      PORT: 3002
+      NODE_ENV: production
+      AUTH_SERVICE_URL: http://auth-service:3001
     ports:
       - "3002:3002"
     depends_on:
       postgres:
         condition: service_healthy
-      auth-service:
-        condition: service_started
     networks:
       - medishift-network
-    restart: unless-stopped
 
   shift-service:
-    build:
-      context: ./services/shift-service
-      dockerfile: Dockerfile
+    image: revanth654/medishift-shift:v1
     container_name: medishift-shift-service
     environment:
-      - PORT=3003
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://medishift:medishift123@postgres:5432/medishift
-      - JWT_SECRET=medishift_jwt_secret_key_2024
-      - AUTH_SERVICE_URL=http://auth-service:3001
-      - STAFF_SERVICE_URL=http://staff-service:3002
-      - LEAVE_SERVICE_URL=http://leave-service:3004
+      DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
+      JWT_SECRET: medishift_jwt_secret_key_2024
+      PORT: 3003
+      NODE_ENV: production
+      AUTH_SERVICE_URL: http://auth-service:3001
+      STAFF_SERVICE_URL: http://staff-service:3002
+      LEAVE_SERVICE_URL: http://leave-service:3004
     ports:
       - "3003:3003"
     depends_on:
       postgres:
         condition: service_healthy
-      auth-service:
-        condition: service_started
-      staff-service:
-        condition: service_started
     networks:
       - medishift-network
-    restart: unless-stopped
 
   leave-service:
-    build:
-      context: ./services/leave-service
-      dockerfile: Dockerfile
+    image: revanth654/medishift-leave:v1
     container_name: medishift-leave-service
     environment:
-      - PORT=3004
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://medishift:medishift123@postgres:5432/medishift
-      - JWT_SECRET=medishift_jwt_secret_key_2024
-      - AUTH_SERVICE_URL=http://auth-service:3001
-      - SHIFT_SERVICE_URL=http://shift-service:3003
+      DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
+      JWT_SECRET: medishift_jwt_secret_key_2024
+      PORT: 3004
+      NODE_ENV: production
+      AUTH_SERVICE_URL: http://auth-service:3001
+      SHIFT_SERVICE_URL: http://shift-service:3003
     ports:
       - "3004:3004"
     depends_on:
       postgres:
         condition: service_healthy
-      auth-service:
-        condition: service_started
-      shift-service:
-        condition: service_started
     networks:
       - medishift-network
-    restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: revanth654/medishift-frontend:v2
     container_name: medishift-frontend
     ports:
       - "3000:80"
@@ -128,11 +99,10 @@ services:
       - leave-service
     networks:
       - medishift-network
-    restart: unless-stopped
-
-volumes:
-  pgdata:
 
 networks:
   medishift-network:
     driver: bridge
+
+volumes:
+  postgres-data:
