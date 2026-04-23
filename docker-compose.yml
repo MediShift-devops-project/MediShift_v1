@@ -17,7 +17,7 @@ services:
       retries: 5
 
   auth-service:
-    image: revanth654/medishift-auth:v1
+    image: revanth654/medishift-auth:v2
     container_name: medishift-auth-service
     environment:
       DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
@@ -34,7 +34,7 @@ services:
       - medishift-network
 
   staff-service:
-    image: revanth654/medishift-staff:v1
+    image: revanth654/medishift-staff:v2
     container_name: medishift-staff-service
     environment:
       DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
@@ -51,7 +51,7 @@ services:
       - medishift-network
 
   shift-service:
-    image: revanth654/medishift-shift:v1
+    image: revanth654/medishift-shift:v2
     container_name: medishift-shift-service
     environment:
       DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
@@ -70,7 +70,7 @@ services:
       - medishift-network
 
   leave-service:
-    image: revanth654/medishift-leave:v1
+    image: revanth654/medishift-leave:v2
     container_name: medishift-leave-service
     environment:
       DATABASE_URL: postgresql://medishift:medishift123@postgres:5432/medishift
@@ -88,7 +88,7 @@ services:
       - medishift-network
 
   frontend:
-    image: revanth654/medishift-frontend:v2
+    image: revanth654/medishift-frontend:v3
     container_name: medishift-frontend
     ports:
       - "3000:80"
